@@ -7,6 +7,9 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn import tree
+from sklearn.ensemble import RandomForestClassifier as RFC
+from sklearn.metrics import zero_one_loss
+import matplotlib.pyplot as plt
 
 
 # Question 1 ====================================================================================================
@@ -88,6 +91,55 @@ print(cm_dt)
 print("\n")
 # Question 5 ====================================================================================================
 print("Question 5:")
+
+N_vals = [1, 3, 5, 7, 9]
+d_vals = [1, 2, 3, 4, 5]
+rfc_scores = []
+
+
+for N in N_vals:
+	line = []
+	for d in d_vals:
+		model = RFC(n_estimators=N, max_depth=d, criterion='entropy')
+		model.fit(X_train, Y_train.ravel())
+		y_pred = model.predict(X_test)
+		error_rate = zero_one_loss(Y_test, y_pred)
+		rfc_scores.append([N, d, error_rate])
+
+print("1) Random forest hyper-parameters run...")
+
+plot_df = pd.DataFrame(rfc_scores, columns=['N', 'd', 'error_rate'])
+scatter_plot = plt.figure()
+ax = scatter_plot.add_subplot(1, 1, 1)
+
+ax.scatter(plot_df["N"], plot_df["d"], s=plot_df['error_rate'] * 400)
+ax.set_title("Scatter plot for random forest")
+ax.set_xlabel("N value")
+ax.set_ylabel("d value")
+print("2) Saving random forest scatter plot...")
+scatter_plot.savefig("Q5_scatterplot.png")
+
+best_vals = plot_df.nsmallest(1, 'error_rate')
+best_N = best_vals['N'].iloc[0]
+best_d = best_vals['d'].iloc[0]
+print("Best N value:", best_N)
+print("Best d value:", best_d)
+
+model = RFC(n_estimators=best_N, max_depth=best_d, criterion='entropy')
+model.fit(X_train, Y_train.ravel())
+print("3) Random forest accuracy with highest performing hyper-parameters: " + 
+	str(round(model.score(X_test, Y_test.ravel()) * 100, 2)) + "%")
+
+predictions_rf = model.predict(X_test)
+y_pred = pd.Series(predictions_rf, name="Predicted")
+cm_rf = pd.crosstab(y_actu, y_pred)
+print("4) Random forest confusion matrix:")
+print(cm_rf)
+
+
+print("\n")
+# Question 6 ====================================================================================================
+print("Question 6:")
 
 
 
