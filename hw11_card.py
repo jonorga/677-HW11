@@ -5,6 +5,8 @@
 import pandas as pd
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn import tree
 
 
 # Question 1 ====================================================================================================
@@ -52,6 +54,41 @@ print(cm_nb)
 print("\n")
 # Question 3 ====================================================================================================
 print("Question 3:")
+
+LR = LogisticRegression(solver='liblinear', random_state=0)
+LR.fit(X_train, Y_train.ravel())
+
+predictions_lr = LR.predict(X_test)
+print("1) Logistic regression class labels predicted...")
+y_pred = pd.Series(predictions_lr, name="Predicted")
+cm_lr = pd.crosstab(y_actu, y_pred)
+
+print("2) Logistic regression accuracy: " + str(round(LR.score(X_test, Y_test) * 100, 2)) + "%")
+print("3) Logistic regression confusion matrix:")
+print(cm_lr)
+
+
+print("\n")
+# Question 4 ====================================================================================================
+print("Question 4:")
+
+DT = tree.DecisionTreeClassifier(criterion = 'entropy')
+DT = DT.fit(X_train, Y_train)
+predictions_dt = DT.predict(X_test)
+print("1) Decision tree class labels predicted...")
+
+y_pred = pd.Series(predictions_dt, name="Predicted")
+cm_dt = pd.crosstab(y_actu, y_pred)
+
+print("2) Logistic regression accuracy: " + str(round(DT.score(X_test, Y_test) * 100, 2)) + "%")
+print("3) Logistic regression confusion matrix:")
+print(cm_dt)
+
+
+print("\n")
+# Question 5 ====================================================================================================
+print("Question 5:")
+
 
 
 
