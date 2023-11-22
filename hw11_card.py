@@ -10,6 +10,8 @@ from sklearn import tree
 from sklearn.ensemble import RandomForestClassifier as RFC
 from sklearn.metrics import zero_one_loss
 import matplotlib.pyplot as plt
+from sklearn import svm
+from sklearn.preprocessing import StandardScaler
 
 
 # Question 1 ====================================================================================================
@@ -141,6 +143,50 @@ print("\n")
 # Question 6 ====================================================================================================
 print("Question 6:")
 
+scaler = StandardScaler()
+scaler.fit(X_train)
+X_train = scaler.transform(X_train)
+scaler.fit(X_test)
+X_test = scaler.transform(X_test)
+
+svm_lin = svm.SVC(kernel='linear')
+svm_deg2 = svm.SVC(kernel='poly', degree=2)
+svm_gauss = svm.SVC(kernel='rbf')
+
+svm_lin.fit(X_train, Y_train.ravel())
+svm_deg2.fit(X_train, Y_train.ravel())
+svm_gauss.fit(X_train, Y_train.ravel())
+
+predictions_svm_lin = svm_lin.predict(X_test)
+predictions_svm_deg2 = svm_deg2.predict(X_test)
+predictions_svm_gauss = svm_gauss.predict(X_test)
+print("1) SVM class labels predicted...")
+
+print("2) SVM accuracy:")
+print("SVM Linear: " + str(round(svm_lin.score(X_test, Y_test) * 100, 2)) + "%")
+print("SVM Degree 2: " + str(round(svm_deg2.score(X_test, Y_test) * 100, 2)) + "%")
+print("SVM Gaussian: " + str(round(svm_gauss.score(X_test, Y_test) * 100, 2)) + "%")
+
+y_pred = pd.Series(predictions_svm_lin, name="Predicted")
+cm_svm_lin = pd.crosstab(y_actu, y_pred)
+y_pred = pd.Series(predictions_svm_deg2, name="Predicted")
+cm_svm_deg2 = pd.crosstab(y_actu, y_pred)
+y_pred = pd.Series(predictions_svm_gauss, name="Predicted")
+cm_svm_gauss = pd.crosstab(y_actu, y_pred)
+
+
+print("\n3) SVM confusion matrices:")
+print("SVM Linear:")
+print(cm_svm_lin)
+print("\nSVM Degree 2:")
+print(cm_svm_deg2)
+print("\nSVM Gaussian:")
+print(cm_svm_gauss)
+
+
+print("\n")
+# Question 7 ====================================================================================================
+print("Question 7:")
 
 
 
