@@ -47,6 +47,8 @@ NB.fit(X_train, Y_train.ravel())
 predictions_nb = NB.predict(X_test)
 print("1) Naive bayesian class labels predicted...")
 
+nb_acc = NB.score(X_test, Y_test)
+
 print("2) Naive bayesian accuracy: " + str(round(NB.score(X_test, Y_test) * 100, 2)) + "%")
 
 y_actu = pd.Series(Y_test.ravel(), name="Actual")
@@ -68,6 +70,8 @@ print("1) Logistic regression class labels predicted...")
 y_pred = pd.Series(predictions_lr, name="Predicted")
 cm_lr = pd.crosstab(y_actu, y_pred)
 
+lr_acc = LR.score(X_test, Y_test)
+
 print("2) Logistic regression accuracy: " + str(round(LR.score(X_test, Y_test) * 100, 2)) + "%")
 print("3) Logistic regression confusion matrix:")
 print(cm_lr)
@@ -84,6 +88,8 @@ print("1) Decision tree class labels predicted...")
 
 y_pred = pd.Series(predictions_dt, name="Predicted")
 cm_dt = pd.crosstab(y_actu, y_pred)
+
+dt_acc = DT.score(X_test, Y_test)
 
 print("2) Logistic regression accuracy: " + str(round(DT.score(X_test, Y_test) * 100, 2)) + "%")
 print("3) Logistic regression confusion matrix:")
@@ -129,6 +135,7 @@ print("Best d value:", best_d)
 
 model = RFC(n_estimators=best_N, max_depth=best_d, criterion='entropy')
 model.fit(X_train, Y_train.ravel())
+rfc_acc = model.score(X_test, Y_test.ravel())
 print("3) Random forest accuracy with highest performing hyper-parameters: " + 
 	str(round(model.score(X_test, Y_test.ravel()) * 100, 2)) + "%")
 
@@ -162,6 +169,10 @@ predictions_svm_deg2 = svm_deg2.predict(X_test)
 predictions_svm_gauss = svm_gauss.predict(X_test)
 print("1) SVM class labels predicted...")
 
+svm_lin_acc = svm_lin.score(X_test, Y_test)
+svm_deg2_acc = svm_deg2.score(X_test, Y_test)
+svm_gauss_acc = svm_gauss.score(X_test, Y_test)
+
 print("2) SVM accuracy:")
 print("SVM Linear: " + str(round(svm_lin.score(X_test, Y_test) * 100, 2)) + "%")
 print("SVM Degree 2: " + str(round(svm_deg2.score(X_test, Y_test) * 100, 2)) + "%")
@@ -187,6 +198,36 @@ print(cm_svm_gauss)
 print("\n")
 # Question 7 ====================================================================================================
 print("Question 7:")
+print("{:<16} {:<8} {:<8} {:<8} {:<8} {:<8} {:<8} {:<8}".format('Method' ,'TP', 'FP', 'TN', 'FN', 
+	'accuracy', 'TPR', 'TNR'))
+
+def PrintTableLine(cm, clf, method, acc):
+	TP = cm["0"].iloc[0]
+	FP = cm["0"].iloc[1]
+	TN = cm["1"].iloc[1]
+	FN = cm["1"].iloc[0]
+	TPR = round(TP / (TP + FN), 2)
+	TNR = round(TN / (TN + FP), 2)
+	print("{:<16} {:<8} {:<8} {:<8} {:<8} {:<8} {:<8} {:<8}".format(method ,TP, FP, TN, FN, 
+		round(acc, 2), TPR, TNR))
+
+
+PrintTableLine(cm_nb, NB, "Naive Bayesian", nb_acc)
+PrintTableLine(cm_lr, LR, "Logistic", lr_acc)
+PrintTableLine(cm_dt, DT, "Decision Tree", dt_acc)
+PrintTableLine(cm_rf, model, "Random Forest", rfc_acc)
+PrintTableLine(cm_svm_lin, svm_lin, "Linear SVM", svm_lin_acc)
+PrintTableLine(cm_svm_deg2, svm_deg2, "Degree 2 SVM", svm_deg2_acc)
+PrintTableLine(cm_svm_gauss, svm_gauss, "Gaussian SVM", svm_gauss_acc)
+
+
+print("\n")
+# Question 8 ====================================================================================================
+print("Question 8:")
+print("One way to find the importance of features is to create various test groups with different features "
+	+ "and create confusion matrices from each run. The better the score from the testing groups, the more"
+	+ " important the tested features are. Weights can be assigned based off the resulting scores.")
+
 
 
 
